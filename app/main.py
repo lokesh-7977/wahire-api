@@ -12,4 +12,4 @@ async def start_db():
 async def root():
     return {"message": "Welcome to the WAHIRE API"}
 
-app.include_router(user_router, prefix="/user", tags=["Users"])
+app.include_router(user_router, prefix="/users", tags=["Users"])
