@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# Logs and databases
+*.log
+*.sqlite3
+instance/
+db.sqlite3
+
+# Environment variables
+.env
+*.env
+
+# IDE/editor files
+.vscode/
+.idea/
+*.iml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Pytest & Coverage reports
+htmlcov/
+.coverage
+.cache
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Uvicorn reload file
+*.pid
+
+# Migrations (if using Alembic)
+migrations/
+
+# Beanie (if using Beanie ODM)
+*.lock
+__beanie_cache__
+
+# MyPy cache
+.mypy_cache/
+
+# Pipenv & Poetry
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Docker
+docker-compose.override.yml
