@@ -52,47 +52,47 @@ async def send_whatsapp_message(to: str, body: str):
     
 
     
-
-### ====================== 📌 USER REGISTRATION ====================== ###
+    ### ====================== 📌 USER REGISTRATION ====================== ###
 @router.post("/register")
 async def register_user(user_data: RegisterSchema):
-    """Registers a new user and sends OTP via WhatsApp."""
-    existing_user = await User.find_one(User.phone == user_data.phone)
-    if existing_user:
-        if not existing_user.isUserDeleted:
-            raise HTTPException(status_code=400, detail="User already exists")
+        """Registers a new user and sends OTP via WhatsApp."""
+        existing_user = await User.find_one(User.phone == user_data.phone)
+        if existing_user:
+            if not existing_user.isUserDeleted:
+                raise HTTPException(status_code=400, detail="User already exists")
+            else:
+                existing_user.isUserDeleted = False
+                existing_user.name = user_data.name
+                await existing_user.save()
         else:
-            existing_user.isUserDeleted = False
-            existing_user.name = user_data.name
-            await existing_user.save()
-    else:
-        user = User(
-            id=str(uuid.uuid4()), 
-            name=user_data.name,
-            phone=user_data.phone,
-            role="user",
-            isPhoneVerified=False,
-            isUserDeleted=False
+            masked_phone = user_data.phone[-4:].rjust(len(user_data.phone), '*')
+            user = User(
+                id=str(uuid.uuid4()), 
+                name=user_data.name,
+                phone=masked_phone,
+                role="user",
+                isPhoneVerified=False,
+                isUserDeleted=False
+            )
+            await user.insert()
+
+        otp = generate_otp(user_data.phone)
+
+        await send_whatsapp_message(
+            user_data.phone,
+            f"""
+    🔐 *WaHire OTP Verification*
+
+    Dear *{user_data.name}*,
+
+    Your OTP for verification is: *{otp}*
+    Valid for *5 minutes*. Do not share it.
+
+    Thank you for choosing *WaHire*! 🚀
+    """
         )
-        await user.insert()
 
-    otp = generate_otp(user_data.phone)
-
-    await send_whatsapp_message(
-        user_data.phone,
-        f"""
-🔐 *WaHire OTP Verification*
-
-Dear *{user_data.name}*,
-
-Your OTP for verification is: *{otp}*
-Valid for *5 minutes*. Do not share it.
-
-Thank you for choosing *WaHire*! 🚀
-"""
-    )
-
-    return {"message": "User registered successfully. OTP sent."}
+        return {"message": "User registered successfully. OTP sent."}
 
 
 
@@ -147,8 +147,8 @@ The WaHire Team 🚀
 ### ====================== 📌 FETCH ALL USERS ====================== ###
 @router.get("/get-all-users")
 async def get_all_users():
-    """Fetches all users."""
-    users = await User.find_all().to_list()
+    """Fetches all users who are not deleted."""
+    users = await User.find(User.isUserDeleted == False).to_list()
     return users
 
 
@@ -186,6 +186,9 @@ async def delete_user(phone: str):
     user = await User.find_one(User.phone == phone)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if user.isUserDeleted:
+        raise HTTPException(status_code=400, detail="User Not Found")
 
     user.isUserDeleted = True
     await user.save()
