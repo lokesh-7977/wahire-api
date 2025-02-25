@@ -120,7 +120,24 @@ async def verify_otp(otp_data: OTPVerifySchema):
 
     await send_whatsapp_message(
         otp_data.phone,
-        "🎉 *Welcome to WaHire!* 🚀\n\n✅ Your account has been verified!\n\nExplore jobs & connect with companies!"
+        f""" 🎉 Welcome to WaHire – Your Professional Job Network! 🎉
+
+✅ Your account has been successfully verified!
+
+🚀 What’s Next? 
+🔍 Receive personalized job alerts tailored to your skills 
+💼 Explore exclusive job opportunities with top employers 
+🤝 Connect with leading companies and grow your career
+
+✨ We’re here to support you every step of the way!
+
+📢 Stay tuned for exciting job updates! 
+
+💡 Tip: Keep your profile updated to receive the best job matches!
+
+Best Regards, 
+The WaHire Team 🚀
+"""
     )
 
     return {"message": "OTP verified successfully"}
